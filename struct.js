@@ -1,7 +1,8 @@
 
 /**
  * 
- * Struct library thingy
+ * Struct library thingy:
+ *     https://github.com/Potat05/Struct
  * 
  * (Everything is in big endianness)
  * 
