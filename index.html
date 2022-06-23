@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Struct Testing</title>
+
+    <!-- Use Struct library inside console. -->
+    <script defer>
+        let Types = null;
+        (async function() {
+            Types = (await import('./struct.js')).Types;
+        }());
+    </script>
+
+    <!-- Random testing -->
+    <script defer type="module" src="./testing.js"></script>
+
+</head>
+<body style="background: #111">
+    
+</body>
+</html>
