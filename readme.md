@@ -79,7 +79,7 @@ const structure = new Types.Struct('myStruct', [
 ]);
 
 // Or add them through .addMember
-structure.addMember(new Types.Uint32('len'), 12);
+structure.addMember(new Types.Uint32('len', 12));
 ```
 
 Get Struct bytes array or url  
