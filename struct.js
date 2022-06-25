@@ -409,6 +409,7 @@ class Struct {
 
     /**
      * Size of struct
+     * @type {number}
      */
     get size() {
         return this.members.reduce((size, member) => size + member.size, 0);
@@ -416,6 +417,7 @@ class Struct {
 
     /**
      * Bytes of struct
+     * @type {Uint8Array}
      */
     get bytes() {
         const arr = new Uint8Array(this.size);
@@ -433,12 +435,13 @@ class Struct {
         console.error(new Error(`Cannot set value of struct! (Maybe use ${MEMBER_ACCESS}struct for member access?)`));
     }
 
+    /** @type {Uint8Array} */
     get value() {
         return this.bytes;
     }
 
 
-
+    /** @type {string} */
     get url() {
         const blob = new Blob([this.bytes], {
             type: 'application/octet-stream'
