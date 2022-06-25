@@ -38,7 +38,7 @@ function SIMPLE_Test() {
 
 
     // Set member struct members value by adding '_'
-    Test._StructInStruct.value1 = 127;
+    Test.$StructInStruct.value1 = 127;
     // get like this it will use byte array
     Test.StructInStruct; // (Setting will error)
 
@@ -46,18 +46,15 @@ function SIMPLE_Test() {
     // Example for adding a string with length.
     Test.addMember(new Types.Uint32('randomStringLength'));
     Test.addMember(new Types.UTF8('randomString', (Math.random() + 1).toString(36).substring(Math.ceil(Math.random()*10))));
-    Test.randomStringLength = Test._randomString.size;
-
-
-    // Some names you cannot use (members, hasMember, addMember, removeMember, getMember, size, getOffset, bytes, value)
-    // Test.addMember(new Types.Uint8('members')); // error
-
+    Test.randomStringLength = Test.$randomString.size;
 
     Test.addMember(new Types.Uint64('big', 0xFFFFFFFFFFFFFFFFn));
     Test.addMember(new Types.Uint64Array('bigArr', [
         0xFFFFFFFFFFFF,
         0xFFFFFFFFFFFF
     ]));
+
+    Test.insertMember('bigArr', 'big');
 
     return Test;
 }
@@ -105,7 +102,7 @@ function VTF_Test() {
 
 
     // Set the KVD resource
-    VTF._resource_KVD.offset = VTF.size;
+    VTF.$resource_KVD.offset = VTF.size;
     const KVD_content = `Info
 {
     "Creator" "Potato"

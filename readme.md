@@ -93,8 +93,8 @@ Access Struct values or members
 structure.addMember(new Types.Uint32('infoLen', 0));
 structure.addMember(new Types.UTF8('info', 'Random Information.'));
 
-// Access members (name to access member value, _name to access member)
-structure.infoLen = structure._info.size;
+// Access members (name to access member value, $name to access member)
+structure.infoLen = structure.$info.size;
 ```
 
 Supports Structs inside of Structs  
@@ -104,7 +104,7 @@ structure.addMember(new Types.Struct('structInsideStruct', [
 ]));
 
 // Access Struct values inside of Struct
-structure._structInsideStruct.string = 'Hot!';
+structure.$structInsideStruct.string = 'Hot!';
 ```
 
 Other stuffs  
@@ -115,13 +115,27 @@ const hasMember = structure.hasMember(name);
 // Remove a member
 const removed = structure.removeMember(name);
 
+// Insert a member
+const index = structure.insertMember(member, insertName, after);
+// Or just name to move member
+structure.insertMember(name, insertName, after);
+// Set after if you want to insert the member after
+
 // Get a members byte offset
 const offset = structure.getOffset(name);
 
 // Cannot add 2 Members with same name
 structure.addMember(new Values.Float32('value'));
 structure.addMember(new Values.Float32('value')); // Error.
-structure.addMember(new Values.Float32('_value')); // Also error because _ is already being used for accessing the member
+structure.addMember(new Values.Float32('$value')); // Also error because $ is already being used for accessing the member
+```
+
+Configuration
+```javascript
+// Inside of 'struct.js' there's some options you can change.
+
+const VALUE_ACCESS = ''; // Used to access member values inside Structs: structure.memberName
+const MEMBER_ACCESS = '$'; // Used to access members inside Structs: structure.$memberName
 ```
 
 

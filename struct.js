@@ -13,6 +13,11 @@
 
 
 
+const VALUE_ACCESS = ''; // Used to access member values inside Structs: structure.memberName
+const MEMBER_ACCESS = '$'; // Used to access members inside Structs: structure.$memberName
+
+
+
 class Uint8 {
     /**
      * Uint8
@@ -275,28 +280,53 @@ class Struct {
     }
 
     /**
+     * If Member name is valid. (Can be added to struct)
+     * @param {string} name 
+     * @returns {number} why
+     */
+    isValidMemberName(name) {
+        if(this.members.some(m => {
+            return (
+                `${VALUE_ACCESS}${m.name}` == `${VALUE_ACCESS}${name}` ||
+                `${VALUE_ACCESS}${m.name}` == `${MEMBER_ACCESS}${name}` ||
+                `${MEMBER_ACCESS}${m.name}` == `${VALUE_ACCESS}${name}`
+            );
+        })) {
+            return -1;
+        }
+
+        if(['members', 'hasMember', 'addMember', 'removeMember', 'insertMember', 'getOffset', 'size', 'bytes', 'value', 'url'].includes(name)) {
+            return -2;
+        }
+
+        return 1;
+    }
+
+    /**
      * Add a member to the end of the struct
      * @param {Member} member 
      */
     addMember(member) {
-        if(this.members.some(m => m.name == member.name || `_${m.name}` == member.name || m.name == `_${member.name}`)) {
+        const isValid = this.isValidMemberName(member.name);
+        if(isValid == -1) {
             console.error(new Error(`Cannot append member to Struct! Struct already has a member named ${member.name}!`, this, member));
             return;
         }
-        if(['members', 'hasMember', 'addMember', 'removeMember', 'getMember', 'size', 'getOffset', 'bytes', 'value', 'url'].includes(member.name)) {
+        if(isValid == -2) {
             console.error(new Error(`Cannot append member to Struct! Cannot use name of ${member.name}`));
             return;
         }
 
+
         this.members.push(member);
 
-        Object.defineProperty(this, member.name, {
+        Object.defineProperty(this, `${VALUE_ACCESS}${member.name}`, {
             configurable: true,
             get: () => member.value,
             set: (value) => member.value = value
         });
 
-        Object.defineProperty(this, `_${member.name}`, {
+        Object.defineProperty(this, `${MEMBER_ACCESS}${member.name}`, {
             configurable: true,
             get: () => member
         });
@@ -308,31 +338,52 @@ class Struct {
      * @returns {Member} removed member
      */
     removeMember(name) {
-        const member = this.getMember(name);
+        const member = this[`${MEMBER_ACCESS}${name}`];
 
         this.members = this.members.filter(member => member.name != name);
 
-        delete this[name];
-        delete this[`_${name}`];
+        delete this[`${VALUE_ACCESS}${name}`];
+        delete this[`${MEMBER_ACCESS}${name}`];
 
         return member;
     }
 
     /**
-     * Gets member from name
-     * @param {string} name 
-     * @returns {Member} member
+     * Insert a member into the struct
+     * @param {string|Member} member Member to move or insert
+     * @param {string} insert Member to insert before or after
+     * @param {boolean} after If to insert after instead of before
+     * @returns {number} Index of member (-1 If can't insert)
      */
-    getMember(name) {
-        return this.members.find(member => member.name == name);
-    }
+    insertMember(member, insert, after=false) {
+        if(typeof member == 'string') {
+            member = this[`${MEMBER_ACCESS}${member}`];
+        } else {
+            const isValid = this.isValidMemberName(member.name);
+            if(isValid == -1) {
+                console.error(new Error(`Cannot insert member to Struct! Struct already has a member named ${member.name}!`, this, member));
+                return -1;
+            }
+            if(isValid == -2) {
+                console.error(new Error(`Cannot insert member to Struct! Cannot use name of ${member.name}`));
+                return -1;
+            }
+        }
+        if(!member) return -1;
 
+        // Find member index to remove
+        const memberIndex = this.members.findIndex(m => m.name == member.name);
 
-    /**
-     * Size of struct
-     */
-    get size() {
-        return this.members.reduce((size, member) => size + member.size, 0);
+        // Find member to insert to
+        let insertIndex = this.members.findIndex(m => m.name == insert);
+        if(insertIndex == -1) return -1;
+        
+        if(after) insertIndex++;
+
+        if(memberIndex != -1) this.members.splice(memberIndex, 1);
+        this.members.splice(insertIndex, 0, member);
+
+        return insertIndex;
     }
 
     /**
@@ -351,6 +402,14 @@ class Struct {
         return -1;
     }
 
+
+    /**
+     * Size of struct
+     */
+    get size() {
+        return this.members.reduce((size, member) => size + member.size, 0);
+    }
+
     /**
      * Bytes of struct
      */
@@ -367,7 +426,7 @@ class Struct {
     }
 
     set value(v) {
-        console.error(new Error('Cannot set value of struct! (Maybe use _struct for access?)'));
+        console.error(new Error(`Cannot set value of struct! (Maybe use ${MEMBER_ACCESS}struct for member access?)`));
     }
 
     get value() {
