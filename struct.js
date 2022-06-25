@@ -264,6 +264,20 @@ class UTF8 {
     }
 }
 
+class Identifier {
+    /**
+     * WILL NOT be added to final byte array
+     * @param {string} name 
+     * @param {any} value 
+     */
+    constructor(name='Identifier', value) {
+        this.name = name;
+        this.value = value;
+    }
+    get size() { return 0; }
+    get bytes() { return new Uint8Array(0); }
+}
+
 
 
 class Struct {
@@ -485,11 +499,12 @@ class Types {
     static ASCII = ASCII;
     static UTF8 = UTF8;
     static Struct = Struct;
+    static Identifier = Identifier;
 }
 
 
 
-/** @type {Uint8|Uint16|Uint32|Uint64|Float32|Float64|ASCII|UTF8|_Uint8Array|_Uint16Array|_Uint32Array|_Uint64Array|_Float32Array|_Float64Array|Struct} */
+/** @type {Uint8|Uint16|Uint32|Uint64|Float32|Float64|ASCII|UTF8|_Uint8Array|_Uint16Array|_Uint32Array|_Uint64Array|_Float32Array|_Float64Array|Struct|Identifier} */
 const Member = undefined;
 // ^^^ For IntelliSense (I don't know any better way to do this.)
 

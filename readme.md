@@ -60,6 +60,9 @@ new Types.UTF8(name, string, maxLength);
 
 // Members is an array of Types/Members
 new Types.Struct(name, Members[]);
+
+// Not added to the final byte array
+new Types.Identifier(name, value);
 ```
 
 
