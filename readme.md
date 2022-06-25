@@ -28,7 +28,7 @@ const structure = new Types.Struct('Custom', [
     new Types.Uint32('data', 12345);
 ]);
 
-const bytes = file.bytes;
+const bytes = structure.bytes;
 ```
 
 
