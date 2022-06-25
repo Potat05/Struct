@@ -305,8 +305,9 @@ class Struct {
     /**
      * Add a member to the end of the struct
      * @param {Member} member 
+     * @param {boolean} front If to add to start of Struct instead of the end
      */
-    addMember(member) {
+    addMember(member, front=false) {
         const isValid = this.isValidMemberName(member.name);
         if(isValid == -1) {
             console.error(new Error(`Cannot append member to Struct! Struct already has a member named ${member.name}!`, this, member));
@@ -317,8 +318,11 @@ class Struct {
             return;
         }
 
-
-        this.members.push(member);
+        if(front) {
+            this.members.unshift(member);
+        } else {
+            this.members.push(member);
+        }
 
         Object.defineProperty(this, `${VALUE_ACCESS}${member.name}`, {
             configurable: true,
