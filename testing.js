@@ -126,5 +126,28 @@ function VTF_Test() {
     return VTF;
 }
 
-console.log('Test1', SIMPLE_Test());
-console.log('VTF Test', VTF_Test());
+function SET_Test() {
+
+    const str = 'Hello, World!';
+
+    const test = new Types.Struct('string', [
+        new Types.Uint32('length', str.length),
+        new Types.ASCII('string', str),
+        new Types.Float64('PI', Math.PI)
+    ]);
+
+    test.setBytes(test.bytes, (struct, bytes, offset, member, prevMember) => {
+        if(member.name == 'string') {
+            const len = prevMember.value;
+            member.value = bytes.slice(offset, offset+len).reduce((str, byte) => str + String.fromCharCode(byte), '');
+            return len;
+        }
+        return -1;
+    });
+
+    return test;
+}
+
+// console.log('Test1', SIMPLE_Test());
+// console.log('VTF Test', VTF_Test());
+console.log('Set test', SET_Test());

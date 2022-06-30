@@ -110,6 +110,27 @@ structure.addMember(new Types.Struct('structInsideStruct', [
 structure.$structInsideStruct.string = 'Hot!';
 ```
 
+Load Uint8Array into Struct
+```javascript
+const structure = new Types.Structure('test', [
+    new Types.Uint32('length'),
+    new Types.ASCII('string')
+]);
+
+// Length + string in bytes
+const bytes = new Uint8Array([13, 0, 0, 0, 72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33]);
+
+// The second argument is a custom interpreter (If -1 it will use default)
+structure.setBytes(bytes, (struct, bytes, offset, member, prevMember) => {
+    if(member.name == 'string') {
+        const length = prevMember.value;
+        member.string = bytes2string(bytes.slice(offset, offset + length));
+        return length;
+    }
+    return -1;
+});
+```
+
 Other stuffs  
 ```javascript
 // If struct has a member

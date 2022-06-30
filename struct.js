@@ -29,6 +29,9 @@ class Uint8 {
         this.value = value;
     }
     get size() { return 1; }
+    set bytes(bytes) {
+        this.value = bytes[0];
+    }
     get bytes() {
         return new Uint8Array([this.value & 0xFF]);
     }
@@ -45,6 +48,9 @@ class Uint16 {
         this.value = value;
     }
     get size() { return 2; }
+    set bytes(bytes) {
+        this.value = (bytes[0] | bytes[1] << 8);
+    }
     get bytes() {
         return new Uint8Array([this.value & 0xFF, (this.value >> 8) & 0xFF]);
     }
@@ -61,6 +67,9 @@ class Uint32 {
         this.value = value;
     }
     get size() { return 4; }
+    set bytes(bytes) {
+        this.value = (bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24);
+    }
     get bytes() {
         return new Uint8Array([this.value & 0xFF, (this.value >> 8) & 0xFF, (this.value >> 16) & 0xFF, (this.value >> 24) & 0xFF]);
     }
@@ -77,6 +86,12 @@ class Uint64 {
         this.value = BigInt(value);
     }
     get size() { return 8; }
+    set bytes(bytes) {
+        this.value = (
+            BigInt(bytes[0]) | BigInt(bytes[1]) << 8n | BigInt(bytes[2]) << 16n | BigInt(bytes[3]) << 24n |
+            BigInt(bytes[4]) << 32n | BigInt(bytes[5]) << 40n | BigInt(bytes[6]) << 48n | BigInt(bytes[7]) << 56n
+        );
+    }
     get bytes() {
         return new Uint8Array([
             Number(this.value & 0xFFn), Number((this.value >> 8n) & 0xFFn), Number((this.value >> 16n) & 0xFFn), Number((this.value >> 24n) & 0xFFn),
@@ -96,6 +111,9 @@ class Float32 {
         this.value = value;
     }
     get size() { return 4; }
+    set bytes(bytes) {
+        this.value = new Float32Array(bytes.buffer)[0];
+    }
     get bytes() {
         return new Uint8Array(new Float32Array([ this.value ]).buffer);
     }
@@ -112,6 +130,9 @@ class Float64 {
         this.value = value;
     }
     get size() { return 8; }
+    set bytes(bytes) {
+        this.value = new Float64Array(bytes.buffer)[0];
+    }
     get bytes() {
         return new Uint8Array(new Float64Array([ this.value ]).buffer);
     }
@@ -128,6 +149,9 @@ class _Uint8Array {
         this.value = new Uint8Array(value);
     }
     get size() { return this.value.byteLength }
+    set bytes(bytes) {
+        this.value = bytes;
+    }
     get bytes() {
         return this.value;
     }
@@ -144,6 +168,9 @@ class _Uint16Array {
         this.value = new Uint16Array(value);
     }
     get size() { return this.value.byteLength }
+    set bytes(bytes) {
+        this.value = new Uint16Array(bytes.buffer);
+    }
     get bytes() {
         return new Uint8Array(this.value.buffer);
     }
@@ -160,6 +187,9 @@ class _Uint32Array {
         this.value = new Uint32Array(value);
     }
     get size() { return this.value.byteLength }
+    set bytes(bytes) {
+        this.value = new Uint32Array(bytes.buffer);
+    }
     get bytes() {
         return new Uint8Array(this.value.buffer);
     }
@@ -182,6 +212,9 @@ class _Uint64Array {
         }
     }
     get size() { return this.value.byteLength }
+    set bytes(bytes) {
+        this.value = new BigUint64Array(bytes.buffer);
+    }
     get bytes() {
         return new Uint8Array(this.value.buffer);
     }
@@ -198,6 +231,9 @@ class _Float32Array {
         this.value = new Float32Array(value); 
     }
     get size() { return this.value.byteLength }
+    set bytes(bytes) {
+        this.value = new Float32Array(bytes.buffer);
+    }
     get bytes() {
         return new Uint8Array(this.value.buffer);
     }
@@ -214,6 +250,9 @@ class _Float64Array {
         this.value = new Float64Array(value); 
     }
     get size() { return this.value.byteLength }
+    set bytes(bytes) {
+        this.value = new Float64Array(bytes.buffer);
+    }
     get bytes() {
         return new Uint8Array(this.value.buffer);
     }
@@ -232,6 +271,9 @@ class ASCII {
         this.maxLength = maxLength;
     }
     get size() { return Math.min(this.value.length, this.maxLength); }
+    set bytes(bytes) {
+        this.value = bytes.reduce((str, byte) => str + String.fromCharCode(byte), '');
+    }
     get bytes() {
         return new Uint8Array(this.size).map((v, i) => this.value.charCodeAt(i));
     }
@@ -257,6 +299,9 @@ class UTF8 {
     get size() {
         return new TextEncoder().encodeInto(this.value, new Uint8Array(this.safeByteLength)).written;
     }
+    set bytes(bytes) {
+        this.value = new TextDecoder().decode(bytes)
+    }
     get bytes() {
         const bytes = new Uint8Array(this.safeByteLength);
         const results = new TextEncoder().encodeInto(this.value, bytes);
@@ -275,6 +320,7 @@ class Identifier {
         this.value = value;
     }
     get size() { return 0; }
+    set bytes(bytes) {}
     get bytes() { return new Uint8Array(0); }
 }
 
@@ -309,7 +355,7 @@ class Struct {
             return -1;
         }
 
-        if(['members', 'hasMember', 'addMember', 'removeMember', 'insertMember', 'getOffset', 'size', 'bytes', 'value', 'url'].includes(name)) {
+        if(['members', 'hasMember', 'addMember', 'removeMember', 'insertMember', 'getOffset', 'size', 'setBytes', 'bytes', 'value', 'url'].includes(name)) {
             return -2;
         }
 
@@ -429,6 +475,41 @@ class Struct {
         return this.members.reduce((size, member) => size + member.size, 0);
     }
 
+
+    /**
+     * Set bytes in struct
+     * @param {Uint8Array} bytes 
+     * @param {Function(struct: Struct, bytes: Uint8Array, offset: number, member: Member, prevMember: Member)} customInterpreter If returns -1 it will not interpret
+     * @param {boolean} interpreterToChildStructs
+     * @returns {boolean} If set all of struct
+     */
+    setBytes(bytes, customInterpreter=(struct, bytes, offset, member, prevMember) => -1, interpreterToChildStructs=false) {
+
+        let offset = 0;
+        for(let i in this.members) {
+            const member = this.members[i];
+
+            // Custom interpreter
+            const cLen = customInterpreter(this, bytes, offset, member, (i == 0 ? null : this.members[i-1]));
+            if(cLen != -1) {
+                offset += cLen;
+                continue;
+            }
+
+            if(interpreterToChildStructs && member instanceof Struct) {
+                member.setBytes(bytes.slice(offset, offset+member.size), customInterpreter);
+            } else {
+                member.bytes = bytes.slice(offset, offset+member.size);
+            }
+            offset += member.size;
+        }
+        return (offset == this.size);
+    }
+
+    set bytes(bytes) {
+        this.setBytes(bytes);
+    }
+
     /**
      * Bytes of struct
      * @type {Uint8Array}
@@ -444,6 +525,8 @@ class Struct {
 
         return arr;
     }
+
+
 
     set value(v) {
         console.error(new Error(`Cannot set value of struct! (Maybe use ${MEMBER_ACCESS}struct for member access?)`));
