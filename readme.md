@@ -120,7 +120,7 @@ const structure = new Types.Structure('test', [
 // Length + string in bytes
 const bytes = new Uint8Array([13, 0, 0, 0, 72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33]);
 
-// The second argument is a custom interpreter (If -1 it will use default)
+// The second argument is a custom interpreter (If returns -1 it will use default)
 structure.setBytes(bytes, (struct, bytes, offset, member, prevMember) => {
     if(member.name == 'string') {
         const length = prevMember.value;
