@@ -333,10 +333,21 @@ class Struct {
     /**
      * Gets member
      * @param {string} name 
+     * @param {boolean} recursive Search for members inside of members.
      * @returns {Member|undefined}
      */
-    member(name) {
-        return this.members.find(member => member.name == name);
+    member(name, recursive=false) {
+        if(!recursive) {
+            return this.members.find(member => member.name == name);
+        }
+
+        for(let member of this.members) {
+            if(member.name == name) return member;
+            if(member instanceof Struct) {
+                const m = member.member(name, true);
+                if(m != undefined) return m;
+            }
+        }
     }
 
     /**
