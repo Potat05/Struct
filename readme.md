@@ -96,8 +96,10 @@ Access Struct values or members
 structure.addMember(new Types.Uint32('infoLen', 0));
 structure.addMember(new Types.UTF8('info', 'Random Information.'));
 
-// Access members (name to access member value, $name to access member)
-structure.infoLen = structure.$info.size;
+// Get members
+structure.member('infoLen').value = structure.member('info').size;
+// OR
+structure.infoLen = structure.$info.size; // ("name" to access member value, "$name" to access member)
 ```
 
 Supports Structs inside of Structs  
@@ -133,9 +135,6 @@ structure.setBytes(bytes, (struct, bytes, offset, member, prevMember) => {
 
 Other stuffs  
 ```javascript
-// If struct has a member
-const hasMember = structure.hasMember(name);
-
 // Remove a member
 const removed = structure.removeMember(name);
 
@@ -149,9 +148,12 @@ structure.insertMember(name, insertName, after);
 const offset = structure.getOffset(name);
 
 // Cannot add 2 Members with same name
-structure.addMember(new Values.Float32('value'));
-structure.addMember(new Values.Float32('value')); // Error.
-structure.addMember(new Values.Float32('$value')); // Also error because $ is already being used for accessing the member
+structure.addMember(new Values.Float32('float'));
+structure.addMember(new Values.Float32('float')); // Error.
+structure.addMember(new Values.Float32('$float')); // Also error because $ is already being used for accessing the member
+
+// Check if member exists
+const memberExists = structure.member('mem') != undefined;
 ```
 
 Configuration

@@ -331,12 +331,12 @@ class Struct {
     members = [];
 
     /**
-     * If Struct has member of name
+     * Gets member
      * @param {string} name 
-     * @returns {boolean}
+     * @returns {Member|undefined}
      */
-    hasMember(name) {
-        return this.members.some(member => member.name == name);
+    member(name) {
+        return this.members.find(member => member.name == name);
     }
 
     /**
@@ -355,7 +355,7 @@ class Struct {
             return -1;
         }
 
-        if(['members', 'hasMember', 'addMember', 'removeMember', 'insertMember', 'getOffset', 'size', 'setBytes', 'bytes', 'value', 'url'].includes(name)) {
+        if(['members', 'member', 'addMember', 'removeMember', 'insertMember', 'getOffset', 'size', 'setBytes', 'bytes', 'value', 'url'].includes(name)) {
             return -2;
         }
 
