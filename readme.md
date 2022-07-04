@@ -1,5 +1,5 @@
 
-# JavaScript Struct
+# [JavaScript Struct](https://github.com/Potat05/Struct)
 
 C++ like Struct for JavaScript.  
 For file data structures.  
@@ -165,9 +165,12 @@ const MEMBER_ACCESS = '$'; // Used to access members inside Structs: structure.$
 ```
 
 
+## Other
 
-## Authors
+### Authors
 
 - [@Potat05](https://github.com/Potat05)  
 
+### Link
 
+- [Potat05/Struct](https://github.com/Potat05/Struct)
