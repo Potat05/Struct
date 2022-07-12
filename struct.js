@@ -508,7 +508,7 @@ class Struct {
             }
 
             if(interpreterToChildStructs && member instanceof Struct) {
-                member.setBytes(bytes.slice(offset, offset+member.size), customInterpreter);
+                member.setBytes(bytes.slice(offset, offset+member.size), customInterpreter, true);
             } else {
                 member.bytes = bytes.slice(offset, offset+member.size);
             }
