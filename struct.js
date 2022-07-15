@@ -497,7 +497,7 @@ class Struct {
     setBytes(bytes, customInterpreter=(struct, bytes, offset, member, prevMember) => -1, interpreterToChildStructs=false) {
 
         let offset = 0;
-        for(let i in this.members) {
+        for(let i=0; i < this.members.length; i++) {
             const member = this.members[i];
 
             // Custom interpreter
