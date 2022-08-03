@@ -490,25 +490,22 @@ class Struct {
     /**
      * Set bytes in struct
      * @param {Uint8Array} bytes 
-     * @param {(struct: Struct, bytes: Uint8Array, offset: number, member: Member, prevMember: Member) => number} customInterpreter If returns -1 it will not interpret
-     * @param {boolean} interpreterToChildStructs
+     * @param {{offset: number, interpreter: (struct: Struct, bytes: Uint8Array, offset: number, member: Member, prevMember: Member) => number, interpreterToChildren: boolean}} options 
      * @returns {boolean} If set all of struct
      */
-    setBytes(bytes, customInterpreter=() => -1, interpreterToChildStructs=false) {
-
-        let offset = 0;
+    setBytes(bytes, { offset=0, interpreter=() => -1, interpreterToChildren=false } = {}) {
         for(let i=0; i < this.members.length; i++) {
             const member = this.members[i];
 
-            // Custom interpreter
-            const cLen = customInterpreter(this, bytes, offset, member, (i == 0 ? null : this.members[i-1]));
+            // interpreter
+            const cLen = interpreter(this, bytes, offset, member, (i == 0 ? null : this.members[i-1]));
             if(cLen != -1) {
                 offset += cLen;
                 continue;
             }
 
-            if(interpreterToChildStructs && member instanceof Struct) {
-                member.setBytes(bytes.slice(offset, offset+member.size), customInterpreter, true);
+            if(interpreterToChildren && member instanceof Struct) {
+                member.setBytes(bytes.slice(offset, offset+member.size), interpreter, true);
             } else {
                 member.bytes = bytes.slice(offset, offset+member.size);
             }

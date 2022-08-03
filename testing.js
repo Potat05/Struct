@@ -136,13 +136,19 @@ function SET_Test() {
         new Types.Float64('PI', Math.PI)
     ]);
 
-    test.setBytes(test.bytes, (struct, bytes, offset, member, prevMember) => {
-        if(member.name == 'string') {
-            const len = prevMember.value;
-            member.value = bytes.slice(offset, offset+len).reduce((str, byte) => str + String.fromCharCode(byte), '');
-            return len;
+    const bytes = test.bytes;
+
+    test.bytes = new Uint8Array(test.size);
+
+    test.setBytes(bytes, {
+        interpreter: (struct, bytes, offset, member, prevMember) => {
+            if(member.name == 'string') {
+                const len = prevMember.value;
+                member.value = bytes.slice(offset, offset+len).reduce((str, byte) => str + String.fromCharCode(byte), '');
+                return len;
+            }
+            return -1;
         }
-        return -1;
     });
 
     return test;
