@@ -127,7 +127,7 @@ structure.setBytes(bytes, {
     interpreter: (struct, bytes, offset, member, prevMember) => {
         if(member.name == 'string') {
             const length = prevMember.value;
-            member.string = bytes2string(bytes.slice(offset, offset + length));
+            member.value = bytes2string(bytes.slice(offset, offset + length));
             return length;
         }
         return -1;
