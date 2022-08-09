@@ -144,7 +144,7 @@ const removed = structure.removeMember(name);
 const index = structure.insertMember(member, insertName, after);
 // Or just name to move member
 structure.insertMember(name, insertName, after);
-// Set after if you want to insert the member after
+// Set after to insert after the found member
 
 // Get a members byte offset
 const offset = structure.getOffset(name);
@@ -160,7 +160,7 @@ const memberExists = structure.member('mem') != undefined;
 
 Configuration
 ```javascript
-// Inside of 'struct.js' there's some options you can change.
+// Inside of 'struct.js' there's some options to change.
 
 const VALUE_ACCESS = ''; // Used to access member values inside Structs: structure.memberName
 const MEMBER_ACCESS = '$'; // Used to access members inside Structs: structure.$memberName
